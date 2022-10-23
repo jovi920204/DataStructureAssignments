@@ -34,68 +34,51 @@ public:
 
 void insert(Node* node, int insertNum);
 void inorder(Node* root);
+int toNumber(string str);
 
 int main(){
-    // int inputArray[1000];
-    // int tmpNum;
-    // int arrayIndex = 0;
-    
-    Node* root = new Node;
-    for (int i=0;i<7;i++){
-        int inputNum;
-        cin >> inputNum;
-        insert(root, inputNum);
+    string inputString;
+    getline(cin, inputString);
+    Node* root = nullptr;
+    string numString = "";
+    for (int i=0;i<inputString.size();i++){
+        if (inputString[i] == ' '){
+            insert(root, toNumber(numString));
+            numString = "";
+            continue;
+        }
+        numString += inputString[i];
     }
     inorder(root);
 }
 
+int toNumber(string str){
+    int len = str.size();
+    int retNum = 0;
+    for (int i=len-1, weight = 1;i>=0;i--, weight*=10){
+        retNum += (str[i]-'0')*weight;
+    }
+    return retNum;
+}
+
 void insert(Node* node, int insertNum){
     if (node == nullptr){
+        node = new Node;
         node->num = insertNum;
+        node->left = node->right = nullptr;
         return;
     }
     if (insertNum > node->num){ // put into right side
-        if (node->right == nullptr){
-            Node* insertNode = new Node;
-            insertNode->num = insertNum;
-            insertNode->left = nullptr;
-            insertNode->right = nullptr;
-            node->right = insertNode;
-        }
-        else{
-            insert(node->right, insertNum);
-        }
+        insert(node->right, insertNum);
     }
     else{ // put into left side
-        if (node->left == nullptr){
-            Node* insertNode = new Node;
-            insertNode->num = insertNum;
-            insertNode->left = nullptr;
-            insertNode->right = nullptr;
-            node->left = insertNode;
-        }
-        else{
-            insert(node->left, insertNum);
-        }
+        insert(node->left, insertNum);
     }
 }
 
-void inorder(Node* root){
-    if (!root) return;
-    Stack stk;
-    Node* cur = root;
-    while(cur || !stk.isEmpty()){
-        cout << "top = " << stk.top()->num << endl;
-        if (cur){
-            stk.push(cur);
-            cur = cur->left;
-        }
-        else{
-            Node* node = stk.top();
-            stk.pop();
-            cout << node->num << " " << endl;
-            cur = node->right;
-        }
-    
-    }
+void inorder(Node* node){
+    if (node == nullptr) return;
+    inorder(node->left);
+    cout << node->num;
+    inorder(node->right);
 }
