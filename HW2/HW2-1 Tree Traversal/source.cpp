@@ -2,6 +2,11 @@
 using namespace std;
 
 struct Node{
+    Node(int _num){
+        num = _num;
+        left = nullptr;
+        right = nullptr;
+    }
     int num;
     Node* left;
     Node* right;
@@ -32,24 +37,36 @@ public:
     }
 };
 
-void insert(Node* node, int insertNum);
-void inorder(Node* root);
+Node* insert(Node* node, int insertNum);
+void inorder(Node* node, string& output);
+void preorder(Node* node, string& output);
+void postorder(Node* node, string& output);
 int toNumber(string str);
 
 int main(){
     string inputString;
-    getline(cin, inputString);
-    Node* root = nullptr;
-    string numString = "";
-    for (int i=0;i<inputString.size();i++){
-        if (inputString[i] == ' '){
-            insert(root, toNumber(numString));
-            numString = "";
-            continue;
+    while(getline(cin, inputString)){
+        inputString += " ";
+        Node* root = nullptr;
+        string numString = "";
+        for (int i=0;i<inputString.size();i++){
+            if (inputString[i] == ' '){
+                root = insert(root, toNumber(numString));
+                numString = "";
+                continue;
+            }
+            numString += inputString[i];
         }
-        numString += inputString[i];
+        string inorderOutput = "";
+        string preorderOutput = "";
+        string postorderOutput = "";
+        inorder(root, inorderOutput);
+        preorder(root, preorderOutput);
+        postorder(root, postorderOutput);
+        cout << inorderOutput.substr(0, inorderOutput.size()-1) << endl;
+        cout << preorderOutput.substr(0, preorderOutput.size()-1) << endl;
+        cout << postorderOutput.substr(0, postorderOutput.size()-1);
     }
-    inorder(root);
 }
 
 int toNumber(string str){
@@ -61,24 +78,35 @@ int toNumber(string str){
     return retNum;
 }
 
-void insert(Node* node, int insertNum){
+Node* insert(Node* node, int insertNum){
     if (node == nullptr){
-        node = new Node;
-        node->num = insertNum;
-        node->left = node->right = nullptr;
-        return;
+        return new Node(insertNum);
     }
-    if (insertNum > node->num){ // put into right side
-        insert(node->right, insertNum);
+    if (insertNum > node->num){
+        node->right = insert(node->right, insertNum);
     }
-    else{ // put into left side
-        insert(node->left, insertNum);
+    else{
+        node->left = insert(node->left, insertNum);
     }
+    return node;
 }
 
-void inorder(Node* node){
+void inorder(Node* node, string& output){
     if (node == nullptr) return;
-    inorder(node->left);
-    cout << node->num;
-    inorder(node->right);
+    inorder(node->left, output);
+    output += to_string(node->num) + " ";
+    inorder(node->right, output);
+}
+
+void preorder(Node* node, string& output){
+    if (node == nullptr) return;
+    output += to_string(node->num) + " ";
+    preorder(node->left, output);
+    preorder(node->right, output);
+}
+void postorder(Node* node, string& output){
+    if (node == nullptr) return;
+    postorder(node->left, output);
+    postorder(node->right, output);
+    output += to_string(node->num) + " ";
 }
