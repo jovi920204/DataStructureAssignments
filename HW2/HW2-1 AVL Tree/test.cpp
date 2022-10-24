@@ -20,12 +20,12 @@ Node* insertValue(Node* node, int insertNum);
 int heightOfNode(Node* node);
 int balanceFactor(Node* node);
 Node* rotationJudge(Node* root);
+Node* deleteRotationJudge(Node* node);
 Node* deleteValue(Node* node, int deleteNum);
 Node* findLargestNode(Node* node);
 void inorder(Node* node);
 void preorder(Node* node);
 void postorder(Node* node);
-
 void findNode(Node* node, int num);
 
 int main(){
@@ -52,6 +52,7 @@ int main(){
         }
         else if (type == 'D'){
             root = deleteValue(root, num);
+            root = deleteRotationJudge(root);
         }
         else if (type == 'F'){
             findNode(root, num);
@@ -59,15 +60,9 @@ int main(){
         else if (type == 'B'){
             cout << balanceFactor(root) << endl;
         }
-        // cout << rotationCount << endl;
-        // cout << rotationRecord;
-        // inorder(root);
-        // cout << endl;
-        // preorder(root);
-        // cout << endl;
-        // postorder(root);
-        // cout << endl;
     }
+    string inorderOutput = "";
+    
     cout << rotationCount << endl;
     cout << rotationRecord;
     return 0;
@@ -142,9 +137,10 @@ int balanceFactor(Node* node){
 
 Node* rotationJudge(Node* node){
     if (node == nullptr) return node;
-    if (balanceFactor(node) >= 2){
-        if (balanceFactor(node->left) >= 2) node->left = rotationJudge(node->left);
-        else if(balanceFactor(node->left) == 1){
+    if (balanceFactor(node) >= 2){ // left > right => go to left node
+        int leftNodeBF = balanceFactor(node->left);
+        if (leftNodeBF >= 2 || leftNodeBF <= -2) node->left = rotationJudge(node->left);
+        else if(leftNodeBF == 1){
             // do LL rotation;
             rotationCount++;
             if (rotationRecord.size() != 0) rotationRecord += ",";
@@ -154,7 +150,7 @@ Node* rotationJudge(Node* node){
             bNode->right = node;
             return bNode;
         }
-        else{
+        else if(leftNodeBF == -1){
             // do LR rotation;
             rotationCount++;
             if (rotationRecord.size() != 0) rotationRecord += ",";
@@ -167,10 +163,21 @@ Node* rotationJudge(Node* node){
             cNode->left = bNode;
             return cNode;
         }
+        else if(leftNodeBF == 0){
+            // do L0 rotation;
+            rotationCount++;
+            if (rotationRecord.size() != 0) rotationRecord += ",";
+            rotationRecord += "R0";
+            Node* bNode = node->left;
+            node->left = bNode->right;
+            bNode->right = node;
+            return bNode;
+        }
     }
     else if (balanceFactor(node) <= -2){
-        if (balanceFactor(node->right) <= -2) node->right = rotationJudge(node->right);
-        else if (balanceFactor(node->right) == -1){
+        int rightNodeBF = balanceFactor(node->right);
+        if (rightNodeBF <= -2 || rightNodeBF >= 2) node->right = rotationJudge(node->right);
+        else if (rightNodeBF == -1){
             // do RR;
             rotationCount++;
             if (rotationRecord.size() != 0) rotationRecord += ",";
@@ -180,7 +187,7 @@ Node* rotationJudge(Node* node){
             bNode->left = node;
             return bNode;
         }
-        else{
+        else if (rightNodeBF == 1){
             // do RL
             rotationCount++;
             if (rotationRecord.size() != 0) rotationRecord += ",";
@@ -193,10 +200,103 @@ Node* rotationJudge(Node* node){
             cNode->left = node;
             return cNode;
         }
+        else if(rightNodeBF == 0){
+            // do R0 rotation;
+            rotationCount++;
+            if (rotationRecord.size() != 0) rotationRecord += ",";
+            rotationRecord += "R0";
+            Node* bNode = node->right;
+            node->right = bNode->left;
+            bNode->left = node;
+            return bNode;
+        }
     }
     else{
         node->left = rotationJudge(node->left);
         node->right = rotationJudge(node->right);
+    }
+    return node;
+}
+
+Node* deleteRotationJudge(Node* node){
+    if (node == nullptr) return node;
+    if (balanceFactor(node) >= 2){ // left > right => go to left node
+        int leftNodeBF = balanceFactor(node->left);
+        if (leftNodeBF >= 2 || leftNodeBF <= -2) node->left = rotationJudge(node->left);
+        else if(leftNodeBF == 1){
+            // do L1 rotation;
+            rotationCount++;
+            if (rotationRecord.size() != 0) rotationRecord += ",";
+            rotationRecord += "R1";
+            Node* bNode = node->left;
+            node->left = bNode->right;
+            bNode->right = node;
+            return bNode;
+        }
+        else if(leftNodeBF == -1){
+            // do LR rotation;
+            rotationCount++;
+            if (rotationRecord.size() != 0) rotationRecord += ",";
+            rotationRecord += "LR";
+            Node* bNode = node->left;
+            Node* cNode = bNode->right;
+            node->left = cNode->right;
+            bNode->right = cNode->left;
+            cNode->right = node;
+            cNode->left = bNode;
+            return cNode;
+        }
+        else if(leftNodeBF == 0){
+            // do L0 rotation;
+            rotationCount++;
+            if (rotationRecord.size() != 0) rotationRecord += ",";
+            rotationRecord += "R0";
+            Node* bNode = node->left;
+            node->left = bNode->right;
+            bNode->right = node;
+            return bNode;
+        }
+    }
+    else if (balanceFactor(node) <= -2){
+        int rightNodeBF = balanceFactor(node->right);
+        if (rightNodeBF <= -2 || rightNodeBF >= 2) node->right = rotationJudge(node->right);
+        else if (rightNodeBF == -1){
+            // do RR;
+            rotationCount++;
+            if (rotationRecord.size() != 0) rotationRecord += ",";
+            rotationRecord += "RR";
+            Node* bNode = node->right;
+            node->right = bNode->left;
+            bNode->left = node;
+            return bNode;
+        }
+        else if (rightNodeBF == 1){
+            // do R1
+            rotationCount++;
+            if (rotationRecord.size() != 0) rotationRecord += ",";
+            rotationRecord += "R1";
+            Node* bNode = node->right;
+            Node* cNode = bNode->left;
+            node->right = cNode->left;
+            bNode->left = cNode->right;
+            cNode->right = bNode;
+            cNode->left = node;
+            return cNode;
+        }
+        else if(rightNodeBF == 0){
+            // do R0 rotation;
+            rotationCount++;
+            if (rotationRecord.size() != 0) rotationRecord += ",";
+            rotationRecord += "R0";
+            Node* bNode = node->right;
+            node->right = bNode->left;
+            bNode->left = node;
+            return bNode;
+        }
+    }
+    else{
+        node->left = deleteRotationJudge(node->left);
+        node->right = deleteRotationJudge(node->right);
     }
     return node;
 }
