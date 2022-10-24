@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
 struct Node{
@@ -29,7 +30,7 @@ void findNode(Node* node, int num);
 int main(){
     string inputString;
     string numString = "";
-    getline(cin, inputString);
+    cin >> inputString;
     inputString += ",";
     Node* root = nullptr;
     for (int i=0;i<inputString.size();i++){
@@ -136,10 +137,15 @@ int balanceFactor(Node* node){
 
 Node* rotationJudge(Node* node){
     if (node == nullptr) return node;
+    if (node->left != nullptr){
+        node->left = rotationJudge(node->left);
+    }
+    if (node->right != nullptr){
+        node->right = rotationJudge(node->right);
+    }
     if (balanceFactor(node) >= 2){ // left > right => go to left node
         int leftNodeBF = balanceFactor(node->left);
-        if (leftNodeBF >= 2 || leftNodeBF <= -2) node->left = rotationJudge(node->left);
-        else if(leftNodeBF == 1){
+        if(leftNodeBF >= 0){
             // do LL rotation;
             rotationCount++;
             if (rotationRecord.size() != 0) rotationRecord += ",";
@@ -149,7 +155,7 @@ Node* rotationJudge(Node* node){
             bNode->right = node;
             return bNode;
         }
-        else if(leftNodeBF == -1){
+        else if(leftNodeBF <= 0){
             // do LR rotation;
             rotationCount++;
             if (rotationRecord.size() != 0) rotationRecord += ",";
@@ -165,8 +171,7 @@ Node* rotationJudge(Node* node){
     }
     else if (balanceFactor(node) <= -2){
         int rightNodeBF = balanceFactor(node->right);
-        if (rightNodeBF <= -2 || rightNodeBF >= 2) node->right = rotationJudge(node->right);
-        else if (rightNodeBF == -1){
+        if (rightNodeBF == -1){
             // do RR;
             rotationCount++;
             if (rotationRecord.size() != 0) rotationRecord += ",";
@@ -190,19 +195,20 @@ Node* rotationJudge(Node* node){
             return cNode;
         }
     }
-    else{
-        node->left = rotationJudge(node->left);
-        node->right = rotationJudge(node->right);
-    }
     return node;
 }
 
 Node* deleteRotationJudge(Node* node){
     if (node == nullptr) return node;
+    if (node->left != nullptr){
+        node->left = deleteRotationJudge(node->left);
+    }
+    if (node->right != nullptr){
+        node->right = deleteRotationJudge(node->right);
+    }
     if (balanceFactor(node) >= 2){ // left > right => go to left node
         int leftNodeBF = balanceFactor(node->left);
-        if (leftNodeBF >= 2 || leftNodeBF <= -2) node->left = rotationJudge(node->left);
-        else if(leftNodeBF == 1){
+        if(leftNodeBF == 1){
             // do LL rotation;
             rotationCount++;
             if (rotationRecord.size() != 0) rotationRecord += ",";
@@ -238,8 +244,7 @@ Node* deleteRotationJudge(Node* node){
     }
     else if (balanceFactor(node) <= -2){
         int rightNodeBF = balanceFactor(node->right);
-        if (rightNodeBF <= -2 || rightNodeBF >= 2) node->right = rotationJudge(node->right);
-        else if (rightNodeBF == -1){
+        if (rightNodeBF == -1){
             // do RR;
             rotationCount++;
             if (rotationRecord.size() != 0) rotationRecord += ",";
@@ -272,10 +277,6 @@ Node* deleteRotationJudge(Node* node){
             bNode->left = node;
             return bNode;
         }
-    }
-    else{
-        node->left = deleteRotationJudge(node->left);
-        node->right = deleteRotationJudge(node->right);
     }
     return node;
 }
