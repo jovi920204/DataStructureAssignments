@@ -3,8 +3,8 @@
 #include <string>
 using namespace std;
 
-void bubble_sort(vector<int>& data);
-void insertion_sort(vector<int>& data);
+void bubble_sort(vector<int> data);
+void insertion_sort(vector<int> data);
 
 int main(){
     vector<int> data;
@@ -17,10 +17,12 @@ int main(){
     // }
     // cout << endl;
     bubble_sort(data);
+    insertion_sort(data);
     return 0;
 }
 // 21 24 28 15 20 19 30 41 20 28 13 12 33 25 7
-void bubble_sort(vector<int>& data){
+// 39 9 45 63 18 81 108 54 72 36
+void bubble_sort(vector<int> data){
     int a, b;
     int count = 0;
     for(int i=0;i<data.size();i++){
@@ -48,6 +50,26 @@ void bubble_sort(vector<int>& data){
     cout << data[data.size()-1] << endl;
 }
 
-void insertion_sort(vector<int>& data){
+void insertion_sort(vector<int> data){
+    int count = 1; // data[0] was insert in index 0
+    for (int i=1;i<data.size();i++){
+        int temp = data[i];
+        int j = i-1;
+        while(temp <= data[j] && j >= 0){
+            data[j+1] = data[j];
+            j--;
+        }
+        data[j+1] = temp;
+        count++;
+        if (count == 5) break;
+    }
+    cout << "Insertion: ";
+    for (int i=0;i<data.size()-1;i++){
+        cout << data[i] << " ";
+    }
+    cout << data[data.size()-1] << endl;
+}
 
+void selection_sort(vector<int> data){
+    
 }
