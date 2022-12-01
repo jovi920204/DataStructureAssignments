@@ -5,6 +5,7 @@ using namespace std;
 
 void bubble_sort(vector<int> data);
 void insertion_sort(vector<int> data);
+void selection_sort(vector<int> data);
 
 int main(){
     vector<int> data;
@@ -18,6 +19,8 @@ int main(){
     // cout << endl;
     bubble_sort(data);
     insertion_sort(data);
+    selection_sort(data);
+    
     return 0;
 }
 // 21 24 28 15 20 19 30 41 20 28 13 12 33 25 7
@@ -71,5 +74,26 @@ void insertion_sort(vector<int> data){
 }
 
 void selection_sort(vector<int> data){
-    
+    int count = 0;
+    for (int i=0;i<data.size();i++){
+        int small = data[i];
+        int pos = i;
+        for (int j=0+i;j<data.size();j++){
+            if (small > data[j]){
+                small = data[j];
+                pos = j;
+            }    
+        }
+        int temp = data[i];
+        data[i] = data[pos];
+        data[pos] = temp;
+        count++;
+        if (count == 5){
+            cout << "Selection: " << small << "; ";
+            for (int i=0;i<data.size()-1;i++){
+                cout << data[i] << " ";
+            }
+            cout << data[data.size()-1];
+        }
+    }
 }
