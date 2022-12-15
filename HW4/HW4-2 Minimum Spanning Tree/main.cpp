@@ -7,7 +7,7 @@ int vertexNum;
 int edgeNum;
 vector<vector<int> > graph;
 
-bool isFinished(int visited[], int vertexNum);
+bool isFinished(vector<int>& visited, int vertexNum);
 
 int main() {
     cin >> vertexNum >> edgeNum;
@@ -28,14 +28,9 @@ int main() {
             graph[endNode - 'A'][startNode - 'A'] = weight;
         }
     }
-    int predecessor[26];
-    int key[26] = { 0 };
-    int visited[26] = { 0 };
-    for (int i = 0; i < vertexNum; i++) {
-        predecessor[i] = -1;
-        key[i] = 10000000000;
-        visited[i] = 0;
-    }
+    vector<int> predecessor(vertexNum,-1);
+    vector<int> key(vertexNum, 10000000000);
+    vector<int> visited(vertexNum,0);
     int currNode = 0;
     key[currNode] = 0;
     while (!isFinished(visited, vertexNum)) {
@@ -46,7 +41,7 @@ int main() {
                 continue;
             }
             else {
-                if (key[i] > graph[currNode][i]) {
+                if (visited[i] == 0 && key[i] > graph[currNode][i]) {
                     predecessor[i] = currNode;
                     key[i] = graph[currNode][i];
                 }
@@ -81,6 +76,7 @@ int main() {
             cout << visited[i] << " ";
         }
         cout << endl;
+        cout << endl;
         */
     }
 
@@ -90,9 +86,9 @@ int main() {
     //     }
     //     cout << endl;
     // }
-    int MST[26][26] = { {0} };
+    vector<vector<int> > MST(vertexNum, vector<int>(vertexNum, 0));
     int totalWeight = 0;
-    for (int i = 0; i < vertexNum; i++) {
+    for (int i = 1; i < vertexNum; i++) {
         int v1 = i;
         int v2 = predecessor[i];
         if (v1 < v2) {
@@ -104,21 +100,27 @@ int main() {
         totalWeight += key[i];
     }
     cout << totalWeight << endl;
+    int count = 0;
     for (int i = 0; i < vertexNum; i++) {
         for (int j = 0; j < vertexNum; j++) {
             if (MST[i][j] == 0) continue;
             if (alphaFlag == 1) {
-                cout << (char)(i + 'A') << " " << (char)(j + 'A') << " " << MST[i][j] << endl;
+                count++;
+                cout << (char)(i + 'A') << " " << (char)(j + 'A') << " " << MST[i][j];
             }
             else {
-                cout << i << " " << j << " " << MST[i][j] << endl;
+                count++;
+                cout << i << " " << j << " " << MST[i][j];
+            }
+            if (count < vertexNum - 1) {
+                cout << endl;
             }
         }
     }
     return 0;
 }
 
-bool isFinished(int visited[], int vertexNum) {
+bool isFinished(vector<int>& visited, int vertexNum) {
     // cout << "Q" << endl;
     for (int i = 0; i < vertexNum; i++) {
         if (visited[i] == 0) {
@@ -127,3 +129,34 @@ bool isFinished(int visited[], int vertexNum) {
     }
     return 1;
 }
+
+
+/*
+7 11
+A B 6
+B C 7
+A D 4
+D B 8
+B E 6
+C E 4
+D F 5
+F E 7
+D E 14
+E G 8
+F G 10
+*/
+
+/*
+7 11
+0 1 5
+0 5 3
+5 4 6
+1 4 1
+1 6 4
+4 6 2
+1 2 10
+6 2 8
+4 3 7
+6 3 9
+3 2 5
+*/
