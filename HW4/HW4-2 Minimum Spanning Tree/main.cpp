@@ -3,11 +3,18 @@
 #include <string>
 using namespace std;
 
+struct Edge{
+    int v1;
+    int v2;
+    int weight;
+};
+
 int vertexNum;
 int edgeNum;
 vector<vector<int> > graph;
-
 bool isFinished(vector<int>& visited, int vertexNum);
+void sorted(vector<Edge>& MST);
+void swapEdge(Edge& e1, Edge& e2);
 
 int main() {
     cin >> vertexNum >> edgeNum;
@@ -34,7 +41,6 @@ int main() {
     int currNode = 0;
     key[currNode] = 0;
     while (!isFinished(visited, vertexNum)) {
-        // cout << "currNode = " << currNode << endl;
         visited[currNode] = 1;
         for (int i = 0; i < graph[currNode].size(); i++) {
             if (graph[currNode][i] == 0) {
@@ -58,64 +64,33 @@ int main() {
             }
         }
         currNode = nextNode;
-
-        /*
-        for (int i = 0; i < vertexNum; i++) {
-            cout << i << " ";
-        }
-        cout << endl;
-        for (int i = 0; i < vertexNum; i++) {
-            cout << predecessor[i] << " ";
-        }
-        cout << endl;
-        for (int i = 0; i < vertexNum; i++) {
-            cout << key[i] << " ";
-        }
-        cout << endl;
-        for (int i = 0; i < vertexNum; i++) {
-            cout << visited[i] << " ";
-        }
-        cout << endl;
-        cout << endl;
-        */
     }
-
-    // for (int i=0;i<graph[0].size();i++){
-    //     for (int j=0;j<graph[i].size();j++){
-    //         cout << graph[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    vector<vector<int> > MST(vertexNum, vector<int>(vertexNum, 0));
     int totalWeight = 0;
-    for (int i = 1; i < vertexNum; i++) {
-        int v1 = i;
-        int v2 = predecessor[i];
-        if (v1 < v2) {
-            MST[v1][v2] = key[v1];
+    vector<Edge> MST;
+    for (int i=1;i<vertexNum;i++){
+        Edge temp;
+        if (i < predecessor[i]) {
+            temp.v1 = i;
+            temp.v2 = predecessor[i];
         }
         else {
-            MST[v2][v1] = key[v1];
+            temp.v2 = i;
+            temp.v1 = predecessor[i];
         }
+        temp.weight = key[i];
         totalWeight += key[i];
+        MST.push_back(temp);
     }
     cout << totalWeight << endl;
-    int count = 0;
-    for (int i = 0; i < vertexNum; i++) {
-        for (int j = 0; j < vertexNum; j++) {
-            if (MST[i][j] == 0) continue;
-            if (alphaFlag == 1) {
-                count++;
-                cout << (char)(i + 'A') << " " << (char)(j + 'A') << " " << MST[i][j];
-            }
-            else {
-                count++;
-                cout << i << " " << j << " " << MST[i][j];
-            }
-            if (count < vertexNum - 1) {
-                cout << endl;
-            }
+    sorted(MST);
+    for (int i=0;i<MST.size();i++){
+        if (alphaFlag == 1){
+            cout << (char)(MST[i].v1+'A') << " " << (char)(MST[i].v2+'A') << " " << MST[i].weight;
         }
+        else{
+            cout << MST[i].v1 << " " << MST[i].v2 << " " << MST[i].weight;
+        }
+        if (i < MST.size()-1) cout << endl;
     }
     return 0;
 }
@@ -130,33 +105,24 @@ bool isFinished(vector<int>& visited, int vertexNum) {
     return 1;
 }
 
+void sorted(vector<Edge>& MST){
+    for (int i=0;i<MST.size()-1;i++){
+        for (int j=0;j<MST.size()-i-1;j++){
+            if (MST[j].weight > MST[j+1].weight){
+                swapEdge(MST[j], MST[j+1]);
+            }
+            if (MST[j].weight == MST[j+1].weight && MST[j].v1 > MST[j+1].v1){
+                swapEdge(MST[j], MST[j+1]);
+            }
+            if (MST[j].weight == MST[j+1].weight && MST[j].v1 == MST[j+1].v1 && MST[j].v2 > MST[j+1].v2){
+                swapEdge(MST[j], MST[j+1]);
+            }
+        }
+    }
+}
 
-/*
-7 11
-A B 6
-B C 7
-A D 4
-D B 8
-B E 6
-C E 4
-D F 5
-F E 7
-D E 14
-E G 8
-F G 10
-*/
-
-/*
-7 11
-0 1 5
-0 5 3
-5 4 6
-1 4 1
-1 6 4
-4 6 2
-1 2 10
-6 2 8
-4 3 7
-6 3 9
-3 2 5
-*/
+void swapEdge(Edge& e1, Edge& e2){
+    Edge t = e1;
+    e1 = e2;
+    e2 = t;
+}
